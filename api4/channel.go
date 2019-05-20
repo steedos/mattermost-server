@@ -120,12 +120,6 @@ func updateChannel(c *Context, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Since the `team_user` role can have PERMISSION_MANAGE_PRIVATE_CHANNEL_PROPERTIES out of the box, we must additionally check membership for private channels.
-		if _, memberErr := c.App.GetChannelMember(channel.Id, c.App.Session.UserId); memberErr != nil {
-			c.Err = model.NewAppError("updateChannel", "api.channel.patch_update_channel.forbidden.app_error", nil, "", http.StatusForbidden)
-			return
-		}
-
 	case model.CHANNEL_GROUP, model.CHANNEL_DIRECT:
 		// Modifying the header is not linked to any specific permission for group/dm channels, so just check for membership.
 		if _, err := c.App.GetChannelMember(channel.Id, c.App.Session.UserId); err != nil {
@@ -165,6 +159,10 @@ func updateChannel(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	if len(channel.Type) > 0 {
 		oldChannel.Type = channel.Type
+	}
+
+	if channel.GroupConstrained != nil {
+		oldChannel.GroupConstrained = channel.GroupConstrained
 	}
 
 	if _, err := c.App.UpdateChannel(oldChannel); err != nil {
@@ -256,12 +254,6 @@ func patchChannel(c *Context, w http.ResponseWriter, r *http.Request) {
 	case model.CHANNEL_PRIVATE:
 		if !c.App.SessionHasPermissionToChannel(c.App.Session, c.Params.ChannelId, model.PERMISSION_MANAGE_PRIVATE_CHANNEL_PROPERTIES) {
 			c.SetPermissionError(model.PERMISSION_MANAGE_PRIVATE_CHANNEL_PROPERTIES)
-			return
-		}
-
-		// Since the `team_user` role can have PERMISSION_MANAGE_PRIVATE_CHANNEL_PROPERTIES out of the box, we must additionally check membership for private channels.
-		if _, memberErr := c.App.GetChannelMember(c.Params.ChannelId, c.App.Session.UserId); memberErr != nil {
-			c.Err = model.NewAppError("patchChannel", "api.channel.patch_update_channel.forbidden.app_error", nil, "", http.StatusForbidden)
 			return
 		}
 
@@ -1049,7 +1041,7 @@ func updateChannelMemberSchemeRoles(c *Context, w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if _, err := c.App.UpdateChannelMemberSchemeRoles(c.Params.ChannelId, c.Params.UserId, schemeRoles.SchemeUser, schemeRoles.SchemeAdmin); err != nil {
+	if _, err := c.App.UpdateChannelMemberSchemeRoles(c.Params.ChannelId, c.Params.UserId, schemeRoles.SchemeGuest, schemeRoles.SchemeUser, schemeRoles.SchemeAdmin); err != nil {
 		c.Err = err
 		return
 	}
@@ -1174,7 +1166,23 @@ func addChannelMember(c *Context, w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	cm, err := c.App.AddChannelMember(member.UserId, channel, c.App.Session.UserId, postRootId, c.App.Session.Id)
+	if channel.IsGroupConstrained() {
+		nonMembers, err := c.App.FilterNonGroupChannelMembers([]string{member.UserId}, channel)
+		if err != nil {
+			if v, ok := err.(*model.AppError); ok {
+				c.Err = v
+			} else {
+				c.Err = model.NewAppError("addChannelMember", "api.channel.add_members.error", nil, err.Error(), http.StatusBadRequest)
+			}
+			return
+		}
+		if len(nonMembers) > 0 {
+			c.Err = model.NewAppError("addChannelMember", "api.channel.add_members.user_denied", map[string]interface{}{"UserIDs": nonMembers}, "", http.StatusBadRequest)
+			return
+		}
+	}
+
+	cm, err := c.App.AddChannelMember(member.UserId, channel, c.App.Session.UserId, postRootId)
 	if err != nil {
 		c.Err = err
 		return
@@ -1199,6 +1207,11 @@ func removeChannelMember(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	if !(channel.Type == model.CHANNEL_OPEN || channel.Type == model.CHANNEL_PRIVATE) {
 		c.Err = model.NewAppError("removeChannelMember", "api.channel.remove_channel_member.type.app_error", nil, "", http.StatusBadRequest)
+		return
+	}
+
+	if channel.IsGroupConstrained() && (c.Params.UserId != c.App.Session.UserId) {
+		c.Err = model.NewAppError("removeChannelMember", "api.channel.remove_member.group_constrained.app_error", nil, "", http.StatusBadRequest)
 		return
 	}
 
