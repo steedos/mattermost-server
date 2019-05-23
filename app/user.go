@@ -31,7 +31,6 @@ import (
 	"github.com/mattermost/mattermost-server/model"
 	"github.com/mattermost/mattermost-server/plugin"
 	"github.com/mattermost/mattermost-server/services/mfa"
-	"github.com/mattermost/mattermost-server/store"
 	"github.com/mattermost/mattermost-server/utils"
 	"github.com/mattermost/mattermost-server/utils/fileutils"
 )
@@ -274,15 +273,6 @@ func (a *App) createUserOrGuest(user *model.User, guest bool) (*model.User, *mod
 				hooks.UserHasBeenCreated(pluginContext, user)
 				return true
 			}, plugin.UserHasBeenCreatedId)
-		})
-	}
-
-	esInterface := a.Elasticsearch
-	if esInterface != nil && *a.Config().ElasticsearchSettings.EnableIndexing {
-		a.Srv.Go(func() {
-			if err := a.indexUser(user); err != nil {
-				mlog.Error("Encountered error indexing user", mlog.String("user_id", user.Id), mlog.Err(err))
-			}
 		})
 	}
 
@@ -1152,15 +1142,6 @@ func (a *App) UpdateUser(user *model.User, sendNotifications bool) (*model.User,
 
 	a.InvalidateCacheForUser(user.Id)
 
-	esInterface := a.Elasticsearch
-	if esInterface != nil && *a.Config().ElasticsearchSettings.EnableIndexing {
-		a.Srv.Go(func() {
-			if err := a.indexUser(user); err != nil {
-				mlog.Error("Encountered error indexing user", mlog.String("user_id", user.Id), mlog.Err(err))
-			}
-		})
-	}
-
 	return rusers[0], nil
 }
 
@@ -1496,15 +1477,6 @@ func (a *App) PermanentDeleteUser(user *model.User) *model.AppError {
 	}
 
 	mlog.Warn(fmt.Sprintf("Permanently deleted account %v id=%v", user.Email, user.Id), mlog.String("user_id", user.Id))
-
-	esInterface := a.Elasticsearch
-	if esInterface != nil && *a.Config().ElasticsearchSettings.EnableIndexing {
-		a.Srv.Go(func() {
-			if err := a.Elasticsearch.DeleteUser(user); err != nil {
-				mlog.Error("Encountered error deleting user", mlog.String("user_id", user.Id), mlog.Err(err))
-			}
-		})
-	}
 
 	return nil
 }
@@ -1893,15 +1865,6 @@ func (a *App) UpdateOAuthUserAttrs(userData io.Reader, user *model.User, provide
 
 		user = result.Data.([2]*model.User)[0]
 		a.InvalidateCacheForUser(user.Id)
-
-		esInterface := a.Elasticsearch
-		if esInterface != nil && *a.Config().ElasticsearchSettings.EnableIndexing {
-			a.Srv.Go(func() {
-				if err := a.indexUser(user); err != nil {
-					mlog.Error("Encountered error indexing user", mlog.String("user_id", user.Id), mlog.Err(err))
-				}
-			})
-		}
 	}
 
 	return nil

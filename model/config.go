@@ -97,7 +97,7 @@ const (
 	SERVICE_SETTINGS_DEFAULT_GFYCAT_API_KEY     = "2_KtH_W5"
 	SERVICE_SETTINGS_DEFAULT_GFYCAT_API_SECRET  = "3wLVZPiswc3DnaiaFoLkDvB4X0IV6CpMkj4tf2inJRsBY6-FnkT08zGmppWFgeof"
 
-	TEAM_SETTINGS_DEFAULT_SITE_NAME                = "Steedos Messenger"
+	TEAM_SETTINGS_DEFAULT_SITE_NAME                = "华信"
 	TEAM_SETTINGS_DEFAULT_MAX_USERS_PER_TEAM       = 50
 	TEAM_SETTINGS_DEFAULT_CUSTOM_BRAND_TEXT        = ""
 	TEAM_SETTINGS_DEFAULT_CUSTOM_DESCRIPTION_TEXT  = ""
@@ -109,12 +109,12 @@ const (
 
 	EMAIL_SETTINGS_DEFAULT_FEEDBACK_ORGANIZATION = ""
 
-	SUPPORT_SETTINGS_DEFAULT_TERMS_OF_SERVICE_LINK = "https://about.mattermost.com/default-terms/"
-	SUPPORT_SETTINGS_DEFAULT_PRIVACY_POLICY_LINK   = "https://about.mattermost.com/default-privacy-policy/"
-	SUPPORT_SETTINGS_DEFAULT_ABOUT_LINK            = "https://about.mattermost.com/default-about/"
-	SUPPORT_SETTINGS_DEFAULT_HELP_LINK             = "https://about.mattermost.com/default-help/"
-	SUPPORT_SETTINGS_DEFAULT_REPORT_A_PROBLEM_LINK = "https://about.mattermost.com/default-report-a-problem/"
-	SUPPORT_SETTINGS_DEFAULT_SUPPORT_EMAIL         = "feedback@mattermost.com"
+	SUPPORT_SETTINGS_DEFAULT_TERMS_OF_SERVICE_LINK = "https://www.steedos.com/cn/steedos/terms/"
+	SUPPORT_SETTINGS_DEFAULT_PRIVACY_POLICY_LINK   = "https://www.steedos.com/cn/steedos/privacy/"
+	SUPPORT_SETTINGS_DEFAULT_ABOUT_LINK            = "https://www.steedos.com/cn/messenger/"
+	SUPPORT_SETTINGS_DEFAULT_HELP_LINK             = "https://www.steedos.com/cn/messenger/"
+	SUPPORT_SETTINGS_DEFAULT_REPORT_A_PROBLEM_LINK = "https://www.steedos.com/cn/messenger/"
+	SUPPORT_SETTINGS_DEFAULT_SUPPORT_EMAIL         = "support@steedos.com"
 	SUPPORT_SETTINGS_DEFAULT_RE_ACCEPTANCE_PERIOD  = 365
 
 	LDAP_SETTINGS_DEFAULT_FIRST_NAME_ATTRIBUTE         = ""
@@ -137,9 +137,9 @@ const (
 	SAML_SETTINGS_DEFAULT_LOCALE_ATTRIBUTE     = ""
 	SAML_SETTINGS_DEFAULT_POSITION_ATTRIBUTE   = ""
 
-	NATIVEAPP_SETTINGS_DEFAULT_APP_DOWNLOAD_LINK         = "https://about.mattermost.com/downloads/"
-	NATIVEAPP_SETTINGS_DEFAULT_ANDROID_APP_DOWNLOAD_LINK = "https://about.mattermost.com/mattermost-android-app/"
-	NATIVEAPP_SETTINGS_DEFAULT_IOS_APP_DOWNLOAD_LINK     = "https://about.mattermost.com/mattermost-ios-app/"
+	NATIVEAPP_SETTINGS_DEFAULT_APP_DOWNLOAD_LINK         = "https://www.steedos.com/cn/messenger/downloads/"
+	NATIVEAPP_SETTINGS_DEFAULT_ANDROID_APP_DOWNLOAD_LINK = "https://www.steedos.com/cn/messenger/downloads/"
+	NATIVEAPP_SETTINGS_DEFAULT_IOS_APP_DOWNLOAD_LINK     = "https://www.steedos.com/cn/messenger/downloads/"
 
 	EXPERIMENTAL_SETTINGS_DEFAULT_LINK_METADATA_TIMEOUT_MILLISECONDS = 5000
 

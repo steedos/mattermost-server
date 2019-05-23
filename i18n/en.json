@@ -1281,6 +1281,10 @@
     "translation": "Unable to upload file {{.Filename}}. {{.Length}} bytes exceeds the maximum allowed {{.Limit}} bytes."
   },
   {
+    "id": "api.file.upload_file.rejected_by_plugin.app_error",
+    "translation": "Unable to upload file {{.Filename}}. Rejected by plugin: {{.Reason}}"
+  },
+  {
     "id": "api.file.write_file.s3.app_error",
     "translation": "Encountered an error writing to S3"
   },
@@ -6213,6 +6217,10 @@
   {
     "id": "store.sql_recover.delete.app_error",
     "translation": "Unable to delete token"
+  },
+  {
+    "id": "store.sql_recover.remove_all_tokens_by_type.app_error",
+    "translation": "Unable to remove all the tokens of a type"
   },
   {
     "id": "store.sql_recover.get_by_code.app_error",

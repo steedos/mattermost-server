@@ -203,7 +203,7 @@
         "SMTPPort": "2500",
         "ConnectionSecurity": "",
         "SendPushNotifications": true,
-        "PushNotificationServer": "https://push-test.mattermost.com",
+        "PushNotificationServer": "http://us.steedos.com:8066/",
         "PushNotificationContents": "generic",
         "EnableEmailBatching": false,
         "EmailBatchingBufferSize": 256,
@@ -234,7 +234,9 @@
         "AboutLink": "https://www.steedos.com/cn/",
         "HelpLink": "https://www.steedos.com/cn/help/",
         "ReportAProblemLink": "https://www.steedos.com/cn/",
-        "SupportEmail": "support@steedos.com"
+        "SupportEmail": "support@steedos.com",
+        "CustomTermsOfServiceEnabled": false,
+        "CustomTermsOfServiceReAcceptancePeriod": 365
     },
     "AnnouncementSettings": {
         "EnableBanner": false,
