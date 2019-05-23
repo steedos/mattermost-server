@@ -303,8 +303,8 @@
         "EnableDaily": false
     },
     "LocalizationSettings": {
-        "DefaultServerLocale": "en",
-        "DefaultClientLocale": "en",
+        "DefaultServerLocale": "zh-CN",
+        "DefaultClientLocale": "zh-CN",
         "AvailableLocales": ""
     },
     "SamlSettings": {
@@ -337,7 +337,7 @@
     "NativeAppSettings": {
         "AppDownloadLink": "https://www.steedos.com/cn/messenger/downloads/",
         "AndroidAppDownloadLink": "https://www.steedos.com/cn/messenger/downloads/",
-        "IosAppDownloadLink": "https://itunes.apple.com/cn/app/华信-messenger/id1458730073"
+        "IosAppDownloadLink": "https://www.steedos.com/cn/messenger/downloads/"
     },
     "ClusterSettings": {
         "Enable": false,
