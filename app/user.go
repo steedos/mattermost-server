@@ -104,6 +104,10 @@ func (a *App) CreateUserWithInviteId(user *model.User, inviteId string) (*model.
 	}
 	team := result.Data.(*model.Team)
 
+	if team.IsGroupConstrained() {
+		return nil, model.NewAppError("CreateUserWithInviteId", "app.team.invite_id.group_constrained.error", nil, "", http.StatusForbidden)
+	}
+
 	user.EmailVerified = false
 
 	ruser, err := a.CreateUser(user)
@@ -1662,6 +1666,7 @@ func (a *App) SearchUsers(props *model.UserSearch, options *model.UserSearchOpti
 }
 
 func (a *App) SearchUsersInChannel(channelId string, term string, options *model.UserSearchOptions) ([]*model.User, *model.AppError) {
+	term = strings.TrimSpace(term)
 	result := <-a.Srv.Store.User().SearchInChannel(channelId, term, options)
 	if result.Err != nil {
 		return nil, result.Err
@@ -1676,6 +1681,7 @@ func (a *App) SearchUsersInChannel(channelId string, term string, options *model
 }
 
 func (a *App) SearchUsersNotInChannel(teamId string, channelId string, term string, options *model.UserSearchOptions) ([]*model.User, *model.AppError) {
+	term = strings.TrimSpace(term)
 	result := <-a.Srv.Store.User().SearchNotInChannel(teamId, channelId, term, options)
 	if result.Err != nil {
 		return nil, result.Err
@@ -1692,6 +1698,8 @@ func (a *App) SearchUsersNotInChannel(teamId string, channelId string, term stri
 func (a *App) SearchUsersInTeam(teamId string, term string, options *model.UserSearchOptions) ([]*model.User, *model.AppError) {
 	var result store.StoreResult
 
+	term = strings.TrimSpace(term)
+
 	esInterface := a.Elasticsearch
 	license := a.License()
 	if esInterface != nil && *a.Config().ElasticsearchSettings.EnableAutocomplete && license != nil && *license.Features.Elasticsearch {
@@ -1699,7 +1707,7 @@ func (a *App) SearchUsersInTeam(teamId string, term string, options *model.UserS
 		if err != nil {
 			return nil, err
 		}
-		if len(listOfAllowedChannels) == 0 {
+		if listOfAllowedChannels != nil && len(listOfAllowedChannels) == 0 {
 			return []*model.User{}, nil
 		}
 
@@ -1726,6 +1734,7 @@ func (a *App) SearchUsersInTeam(teamId string, term string, options *model.UserS
 }
 
 func (a *App) SearchUsersNotInTeam(notInTeamId string, term string, options *model.UserSearchOptions) ([]*model.User, *model.AppError) {
+	term = strings.TrimSpace(term)
 	result := <-a.Srv.Store.User().SearchNotInTeam(notInTeamId, term, options)
 	if result.Err != nil {
 		return nil, result.Err
@@ -1740,6 +1749,7 @@ func (a *App) SearchUsersNotInTeam(notInTeamId string, term string, options *mod
 }
 
 func (a *App) SearchUsersWithoutTeam(term string, options *model.UserSearchOptions) ([]*model.User, *model.AppError) {
+	term = strings.TrimSpace(term)
 	result := <-a.Srv.Store.User().SearchWithoutTeam(term, options)
 	if result.Err != nil {
 		return nil, result.Err
@@ -1755,6 +1765,8 @@ func (a *App) SearchUsersWithoutTeam(term string, options *model.UserSearchOptio
 
 func (a *App) AutocompleteUsersInChannel(teamId string, channelId string, term string, options *model.UserSearchOptions) (*model.UserAutocompleteInChannel, *model.AppError) {
 	var uchan, nuchan store.StoreChannel
+
+	term = strings.TrimSpace(term)
 
 	esInterface := a.Elasticsearch
 	license := a.License()
@@ -1815,6 +1827,8 @@ func (a *App) AutocompleteUsersInChannel(teamId string, channelId string, term s
 func (a *App) AutocompleteUsersInTeam(teamId string, term string, options *model.UserSearchOptions) (*model.UserAutocompleteInTeam, *model.AppError) {
 	autocomplete := &model.UserAutocompleteInTeam{}
 	var result store.StoreResult
+
+	term = strings.TrimSpace(term)
 
 	esInterface := a.Elasticsearch
 	license := a.License()
@@ -2084,6 +2098,11 @@ func (a *App) GetViewUsersRestrictions(userId string) (*model.ViewUsersRestricti
 	return &model.ViewUsersRestrictions{Teams: teamIdsWithPermission, Channels: channelIds}, nil
 }
 
+/**
+ * Returns a list with the channel ids that the user has permissions to view on a
+ * team. If the result is an empty list, the user can't view any channel; if it's
+ * nil, there are no restrictions for the user in the specified team.
+ */
 func (a *App) GetViewUsersRestrictionsForTeam(userId string, teamId string) ([]string, *model.AppError) {
 	if a.HasPermissionTo(userId, model.PERMISSION_VIEW_MEMBERS) {
 		return nil, nil
