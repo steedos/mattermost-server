@@ -226,6 +226,7 @@ type ServiceSettings struct {
 	UseLetsEncrypt                                    *bool    `restricted:"true"`
 	LetsEncryptCertificateCacheFile                   *string  `restricted:"true"`
 	Forward80To443                                    *bool    `restricted:"true"`
+	TrustedProxyIPHeader                              []string `restricted:"true"`
 	ReadTimeout                                       *int     `restricted:"true"`
 	WriteTimeout                                      *int     `restricted:"true"`
 	MaximumLoginAttempts                              *int     `restricted:"true"`
@@ -293,7 +294,7 @@ type ServiceSettings struct {
 	EnableEmailInvitations                            *bool
 	ExperimentalLdapGroupSync                         *bool
 	DisableBotsWhenOwnerIsDeactivated                 *bool `restricted:"true"`
-	CreateBotAccounts                                 *bool
+	EnableBotAccountCreation                          *bool
 }
 
 func (s *ServiceSettings) SetDefaults() {
@@ -432,6 +433,10 @@ func (s *ServiceSettings) SetDefaults() {
 
 	if s.Forward80To443 == nil {
 		s.Forward80To443 = NewBool(false)
+	}
+
+	if s.TrustedProxyIPHeader == nil {
+		s.TrustedProxyIPHeader = []string{HEADER_FORWARDED, HEADER_REAL_IP}
 	}
 
 	if s.TimeBetweenUserTypingUpdatesMilliseconds == nil {
@@ -637,8 +642,8 @@ func (s *ServiceSettings) SetDefaults() {
 		s.DisableBotsWhenOwnerIsDeactivated = NewBool(true)
 	}
 
-	if s.CreateBotAccounts == nil {
-		s.CreateBotAccounts = NewBool(false)
+	if s.EnableBotAccountCreation == nil {
+		s.EnableBotAccountCreation = NewBool(false)
 	}
 }
 
@@ -725,7 +730,6 @@ func (s *MetricsSettings) SetDefaults() {
 type ExperimentalSettings struct {
 	ClientSideCertEnable            *bool
 	ClientSideCertCheck             *string
-	DisablePostMetadata             *bool  `restricted:"true"`
 	EnableClickToReply              *bool  `restricted:"true"`
 	LinkMetadataTimeoutMilliseconds *int64 `restricted:"true"`
 	RestrictSystemAdmin             *bool  `restricted:"true"`
@@ -738,10 +742,6 @@ func (s *ExperimentalSettings) SetDefaults() {
 
 	if s.ClientSideCertCheck == nil {
 		s.ClientSideCertCheck = NewString(CLIENT_SIDE_CERT_CHECK_SECONDARY_AUTH)
-	}
-
-	if s.DisablePostMetadata == nil {
-		s.DisablePostMetadata = NewBool(false)
 	}
 
 	if s.EnableClickToReply == nil {
