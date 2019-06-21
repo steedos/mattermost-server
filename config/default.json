@@ -193,7 +193,7 @@
         "SendEmailNotifications": true,
         "UseChannelInEmailNotifications": false,
         "RequireEmailVerification": false,
-        "FeedbackName": "",
+        "FeedbackName": "华信通知",
         "FeedbackEmail": "test@example.com",
         "ReplyToAddress": "test@example.com",
         "FeedbackOrganization": "",
